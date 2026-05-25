@@ -1,0 +1,144 @@
+{% extends "metodos/base.html" %}
+{% block title %}Método del Coseno · Métodos Numéricos{% endblock %}
+{% block breadcrumb %}método-del-coseno{% endblock %}
+
+{% block content %}
+
+<div style="margin-bottom:28px;">
+  <h2 style="font-size:28px;font-weight:800;color:var(--text);margin-bottom:6px;">
+    Método del Coseno
+  </h2>
+  <p style="color:var(--text2);font-size:13px;font-family:'JetBrains Mono',monospace;line-height:1.6;">
+    Iteración de punto fijo con amortiguador trigonométrico adaptativo.<br>
+    El factor cos(f(xₙ)) reduce el paso cuando la función toma valores grandes.
+  </p>
+</div>
+
+<!-- FÓRMULA -->
+<div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:18px 24px;margin-bottom:28px;">
+  <div style="font-size:13px;font-family:'JetBrains Mono',monospace;color:var(--text2);margin-bottom:10px;">
+    Función de iteración g(x):
+  </div>
+  <div style="font-size:19px;font-family:'JetBrains Mono',monospace;color:var(--accent2);margin-bottom:8px;">
+    x<sub>n+1</sub> = x<sub>n</sub> − f(x<sub>n</sub>) · cos( f(x<sub>n</sub>) )
+  </div>
+  <div style="font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--text3);">
+    Cuando f(xₙ) → 0  el coseno → 1 y converge rápidamente.
+    El amortiguador |cos| ≤ 1 estabiliza la iteración en zonas alejadas de la raíz.
+  </div>
+</div>
+
+<!-- FORM -->
+<div class="card">
+  <div class="card-title">Parámetros de entrada</div>
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-grid">
+      <div class="form-group full">
+        <label for="funcion">f(x) — Función</label>
+        <input type="text" id="funcion" name="funcion"
+               placeholder="Ej: x**3 - x - 2  |  sin(x) - x/2  |  exp(x) - 3*x"
+               value="{{ funcion|default:'' }}" autocomplete="off">
+        <span class="hint">Sintaxis Python/SymPy: x**2, sin(x), cos(x), exp(x), log(x), sqrt(x), pi, e</span>
+      </div>
+      <div class="form-group">
+        <label for="x0">x₀ — Valor inicial</label>
+        <input type="number" id="x0" name="x0" step="any"
+               placeholder="Ej: 1.5" value="{{ x0|default:'' }}">
+      </div>
+      <div class="form-group">
+        <label for="tolerancia">Tolerancia (ε)</label>
+        <input type="number" id="tolerancia" name="tolerancia" step="any"
+               placeholder="Ej: 0.0001" value="{{ tolerancia|default:'' }}">
+      </div>
+      <div class="form-group">
+        <label for="max_iter">Máximo de iteraciones</label>
+        <input type="number" id="max_iter" name="max_iter" min="1" max="1000"
+               placeholder="Ej: 50" value="{{ max_iter|default:'' }}">
+      </div>
+      <div class="form-group" style="align-self:end;">
+        <button type="submit" class="btn-calcular">⟶ Calcular</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+{% if errores %}
+  <div class="alert alert-error">
+    <span>⚠</span>
+    <ul style="list-style:none;display:flex;flex-direction:column;gap:4px;">
+      {% for e in errores %}<li>{{ e }}</li>{% endfor %}
+    </ul>
+  </div>
+{% endif %}
+
+{% if resultado %}
+
+  {% if resultado.error %}
+    <div class="alert alert-error"><span>✕</span> {{ resultado.error }}</div>
+  {% endif %}
+
+  {% if resultado.advertencia %}
+    <div class="alert alert-warn"><span>⚡</span> {{ resultado.advertencia }}</div>
+  {% endif %}
+
+  {% if resultado.g_str %}
+  <div class="derivada-box" style="border-left-color:var(--accent2);margin-bottom:24px;">
+    <div>
+      <div class="label">Función de iteración</div>
+      <div class="expr" style="color:var(--accent2);">{{ resultado.g_str }}</div>
+    </div>
+    <div style="margin-left:auto;font-size:22px;">g</div>
+  </div>
+  {% endif %}
+
+  {% if resultado.iteraciones %}
+  <div class="card">
+    <div class="card-title">Tabla de iteraciones</div>
+    <div class="tabla-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>n</th>
+            <th>xₙ</th>
+            <th>f(xₙ)</th>
+            <th>cos(f(xₙ))</th>
+            <th>paso = f·cos(f)</th>
+            <th>xₙ₊₁</th>
+            <th>|error|</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for it in resultado.iteraciones %}
+          <tr>
+            <td>{{ it.n }}</td>
+            <td>{{ it.xi }}</td>
+            <td>{{ it.fxi }}</td>
+            <td>{{ it.cos_fxi }}</td>
+            <td>{{ it.paso }}</td>
+            <td>{{ it.xi_nuevo }}</td>
+            <td>{{ it.error }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+    {% if resultado.raiz %}
+    <div class="resultado-final">
+      <div>
+        <div class="rlabel">Raíz aproximada encontrada</div>
+        <div class="rvalue">x ≈ {{ resultado.raiz }}</div>
+        <div style="font-size:11px;color:var(--text2);font-family:'JetBrains Mono',monospace;margin-top:6px;">
+          Convergencia en {{ resultado.iteraciones|length }} iteración{{ resultado.iteraciones|length|pluralize:"es" }}
+        </div>
+      </div>
+      <div class="ricon">✓</div>
+    </div>
+    {% endif %}
+
+  {% endif %}
+{% endif %}
+
+{% endblock %}
