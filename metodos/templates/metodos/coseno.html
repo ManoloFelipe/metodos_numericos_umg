@@ -1,144 +1,160 @@
 {% extends "metodos/base.html" %}
-{% block title %}Método del Coseno · Métodos Numéricos{% endblock %}
-{% block breadcrumb %}método-del-coseno{% endblock %}
+{% block title %}Bisección · Métodos Numéricos{% endblock %}
+{% block breadcrumb %}bisección{% endblock %}
+
+{% block extra_css %}
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'metodos/css/teclado.css' %}">
+  <link rel="stylesheet" href="{% static 'metodos/css/pasoapaso.css' %}">
+{% endblock %}
 
 {% block content %}
 
 <div style="margin-bottom:28px;">
-  <h2 style="font-size:28px;font-weight:800;color:var(--text);margin-bottom:6px;">
-    Método del Coseno
-  </h2>
+  <h2 style="font-size:28px;font-weight:800;color:var(--text);margin-bottom:6px;">Método de Bisección</h2>
   <p style="color:var(--text2);font-size:13px;font-family:'JetBrains Mono',monospace;line-height:1.6;">
-    Iteración de punto fijo con amortiguador trigonométrico adaptativo.<br>
-    El factor cos(f(xₙ)) reduce el paso cuando la función toma valores grandes.
+    Divide el intervalo [xi, xf] a la mitad en cada iteración.<br>
+    Requiere que f(xi)·f(xf) &lt; 0 — si no, el intervalo se expande automáticamente.
   </p>
 </div>
 
 <!-- FÓRMULA -->
 <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:18px 24px;margin-bottom:28px;">
-  <div style="font-size:13px;font-family:'JetBrains Mono',monospace;color:var(--text2);margin-bottom:10px;">
-    Función de iteración g(x):
-  </div>
-  <div style="font-size:19px;font-family:'JetBrains Mono',monospace;color:var(--accent2);margin-bottom:8px;">
-    x<sub>n+1</sub> = x<sub>n</sub> − f(x<sub>n</sub>) · cos( f(x<sub>n</sub>) )
+  <div style="font-size:19px;font-family:'JetBrains Mono',monospace;color:var(--accent3);margin-bottom:8px;">
+    xm = (xi + xf) / 2
   </div>
   <div style="font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--text3);">
-    Cuando f(xₙ) → 0  el coseno → 1 y converge rápidamente.
-    El amortiguador |cos| ≤ 1 estabiliza la iteración en zonas alejadas de la raíz.
+    Si f(xi)·f(xm) &gt; 0 → xi = xm &nbsp;|&nbsp; Si f(xi)·f(xm) &lt; 0 → xf = xm
+    &nbsp;|&nbsp; error = (xm − xi) / xm × 100
   </div>
 </div>
 
 <!-- FORM -->
 <div class="card">
   <div class="card-title">Parámetros de entrada</div>
-  <form method="post">
+  <form method="post" id="form-metodo">
     {% csrf_token %}
+    <input type="hidden" name="funcion" id="funcion-hidden">
     <div class="form-grid">
+
       <div class="form-group full">
-        <label for="funcion">f(x) — Función</label>
-        <input type="text" id="funcion" name="funcion"
-               placeholder="Ej: x**3 - x - 2  |  sin(x) - x/2  |  exp(x) - 3*x"
-               value="{{ funcion|default:'' }}" autocomplete="off">
-        <span class="hint">Sintaxis Python/SymPy: x**2, sin(x), cos(x), exp(x), log(x), sqrt(x), pi, e</span>
+        <label for="funcion-display">f(x) — Función</label>
+        <input type="text" id="funcion-display" name="funcion-display"
+               placeholder="Ej: x^4 + 3*x^3 - 2  |  sin(x) - x/2"
+               value="{{ funcion_display|default:'' }}" autocomplete="off">
+        {% include "metodos/_teclado.html" %}
+        <span class="hint">Usa <strong>^</strong> para potencias. También: sin, cos, tan, log, ln, exp, sqrt, abs, pi, e</span>
       </div>
+
       <div class="form-group">
-        <label for="x0">x₀ — Valor inicial</label>
-        <input type="number" id="x0" name="x0" step="any"
-               placeholder="Ej: 1.5" value="{{ x0|default:'' }}">
+        <label for="xi">xi — Extremo inferior</label>
+        <input type="number" id="xi" name="xi" step="any" placeholder="Ej: 0" value="{{ xi|default:'' }}">
+        <span class="hint">Inicio del intervalo</span>
       </div>
+
       <div class="form-group">
-        <label for="tolerancia">Tolerancia (ε)</label>
-        <input type="number" id="tolerancia" name="tolerancia" step="any"
-               placeholder="Ej: 0.0001" value="{{ tolerancia|default:'' }}">
+        <label for="xf">xf — Extremo superior</label>
+        <input type="number" id="xf" name="xf" step="any" placeholder="Ej: 2" value="{{ xf|default:'' }}">
+        <span class="hint">Fin del intervalo (xi &lt; xf)</span>
       </div>
+
+      <div class="form-group">
+        <label for="tolerancia">Tolerancia % (error)</label>
+        <input type="number" id="tolerancia" name="tolerancia" step="any" placeholder="Ej: 0.25" value="{{ tolerancia|default:'' }}">
+        <span class="hint">Criterio de parada en porcentaje</span>
+      </div>
+
       <div class="form-group">
         <label for="max_iter">Máximo de iteraciones</label>
-        <input type="number" id="max_iter" name="max_iter" min="1" max="1000"
-               placeholder="Ej: 50" value="{{ max_iter|default:'' }}">
+        <input type="number" id="max_iter" name="max_iter" min="1" max="1000" placeholder="Ej: 20" value="{{ max_iter|default:'' }}">
       </div>
-      <div class="form-group" style="align-self:end;">
+
+      <div class="form-group full" style="align-self:end;">
         <button type="submit" class="btn-calcular">⟶ Calcular</button>
       </div>
+
     </div>
   </form>
 </div>
 
 {% if errores %}
-  <div class="alert alert-error">
-    <span>⚠</span>
-    <ul style="list-style:none;display:flex;flex-direction:column;gap:4px;">
-      {% for e in errores %}<li>{{ e }}</li>{% endfor %}
-    </ul>
-  </div>
+<div class="alert alert-error">
+  <span>⚠</span>
+  <ul style="list-style:none;display:flex;flex-direction:column;gap:4px;">
+    {% for e in errores %}<li>{{ e }}</li>{% endfor %}
+  </ul>
+</div>
 {% endif %}
 
 {% if resultado %}
+  {% if resultado.error %}<div class="alert alert-error"><span>✕</span> {{ resultado.error }}</div>{% endif %}
+  {% if resultado.advertencia %}<div class="alert alert-warn"><span>⚡</span> {{ resultado.advertencia }}</div>{% endif %}
 
-  {% if resultado.error %}
-    <div class="alert alert-error"><span>✕</span> {{ resultado.error }}</div>
-  {% endif %}
-
-  {% if resultado.advertencia %}
-    <div class="alert alert-warn"><span>⚡</span> {{ resultado.advertencia }}</div>
-  {% endif %}
-
-  {% if resultado.g_str %}
-  <div class="derivada-box" style="border-left-color:var(--accent2);margin-bottom:24px;">
-    <div>
-      <div class="label">Función de iteración</div>
-      <div class="expr" style="color:var(--accent2);">{{ resultado.g_str }}</div>
-    </div>
-    <div style="margin-left:auto;font-size:22px;">g</div>
-  </div>
+  {% if resultado.intervalo_modificado %}
+  <div class="alert alert-warn"><span>⚠</span> {{ resultado.intervalo_modificado }}</div>
   {% endif %}
 
   {% if resultado.iteraciones %}
+
+  <div class="derivada-box" style="border-left-color:var(--accent3);">
+    <div><div class="label">Función ingresada</div>
+    <div class="expr" style="color:var(--accent3);">f(x) = {{ funcion_display }}</div></div>
+  </div>
+
+  <script id="pap-data" type="application/json">
+  {"raiz": {% if resultado.raiz %}{{ resultado.raiz }}{% else %}null{% endif %},
+   "iteraciones": [{% for it in resultado.iteraciones %}{"n":{{ it.n }},"xi":{{ it.xi }},"xf":{{ it.xf }},"xm":{{ it.xm }},"fxi":{{ it.fxi }},"fxm":{{ it.fxm }},"producto":{{ it.producto }},"error":{{ it.error }}}{% if not forloop.last %},{% endif %}{% endfor %}]}
+  </script>
+
+  {% include "metodos/_pasoapaso.html" %}
+
   <div class="card">
     <div class="card-title">Tabla de iteraciones</div>
-    <div class="tabla-wrapper">
-      <table>
-        <thead>
-          <tr>
-            <th>n</th>
-            <th>xₙ</th>
-            <th>f(xₙ)</th>
-            <th>cos(f(xₙ))</th>
-            <th>paso = f·cos(f)</th>
-            <th>xₙ₊₁</th>
-            <th>|error|</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for it in resultado.iteraciones %}
-          <tr>
-            <td>{{ it.n }}</td>
-            <td>{{ it.xi }}</td>
-            <td>{{ it.fxi }}</td>
-            <td>{{ it.cos_fxi }}</td>
-            <td>{{ it.paso }}</td>
-            <td>{{ it.xi_nuevo }}</td>
-            <td>{{ it.error }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+    <div class="resultado-grid">
+      <div class="tabla-wrapper">
+        <table>
+          <thead>
+            <tr><th>n</th><th>xi</th><th>xf</th><th>xm</th><th>f(xi)</th><th>f(xm)</th><th>f(xi)·f(xm)</th><th>error %</th></tr>
+          </thead>
+          <tbody>
+            {% for it in resultado.iteraciones %}
+            <tr>
+              <td>{{ it.n }}</td><td>{{ it.xi }}</td><td>{{ it.xf }}</td><td>{{ it.xm }}</td>
+              <td>{{ it.fxi }}</td><td>{{ it.fxm }}</td>
+              <td style="color:{% if it.producto < 0 %}var(--accent){% elif it.producto > 0 %}var(--accent3){% else %}var(--accent2){% endif %}">{{ it.producto }}</td>
+              <td>{{ it.error }}%</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% if resultado.grafico %}
+      <div class="grafico-wrapper">{{ resultado.grafico|safe }}</div>
+      {% endif %}
     </div>
   </div>
 
-    {% if resultado.raiz %}
-    <div class="resultado-final">
-      <div>
-        <div class="rlabel">Raíz aproximada encontrada</div>
-        <div class="rvalue">x ≈ {{ resultado.raiz }}</div>
-        <div style="font-size:11px;color:var(--text2);font-family:'JetBrains Mono',monospace;margin-top:6px;">
-          Convergencia en {{ resultado.iteraciones|length }} iteración{{ resultado.iteraciones|length|pluralize:"es" }}
-        </div>
+  {% if resultado.raiz %}
+  <div class="resultado-final">
+    <div>
+      <div class="rlabel">Raíz aproximada encontrada</div>
+      <div class="rvalue">x ≈ {{ resultado.raiz }}</div>
+      <div style="font-size:11px;color:var(--text2);font-family:'JetBrains Mono',monospace;margin-top:6px;">
+        Convergencia en {{ resultado.iteraciones|length }} iteración{{ resultado.iteraciones|length|pluralize:"es" }}
       </div>
-      <div class="ricon">✓</div>
     </div>
-    {% endif %}
+    <div class="ricon">✓</div>
+  </div>
+  {% endif %}
 
   {% endif %}
 {% endif %}
 
+{% endblock %}
+
+{% block scripts %}
+  {% load static %}
+  <script src="{% static 'metodos/js/teclado.js' %}"></script>
+  <script src="{% static 'metodos/js/pasoapaso_core.js' %}"></script>
+  <script src="{% static 'metodos/js/pasoapaso_biseccion.js' %}"></script>
 {% endblock %}

@@ -1,0 +1,42 @@
+<div class="teclado">
+  <div class="teclado-grupo">
+    <span class="teclado-label">Variables</span>
+    <button type="button" class="tbtn" onclick="insertar('x')">x</button>
+    <button type="button" class="tbtn" onclick="insertar('y')">y</button>
+    <button type="button" class="tbtn" onclick="insertar('z')">z</button>
+  </div>
+  <div class="teclado-grupo">
+    <span class="teclado-label">Operaciones</span>
+    <button type="button" class="tbtn tbtn-accent" onclick="insertar('^')">xʸ</button>
+    <button type="button" class="tbtn" onclick="insertar('sqrt(')">√</button>
+    <button type="button" class="tbtn" onclick="insertar('/')">÷</button>
+    <button type="button" class="tbtn" onclick="insertar('*')">×</button>
+    <button type="button" class="tbtn" onclick="insertar('+')">+</button>
+    <button type="button" class="tbtn" onclick="insertar('-')">−</button>
+  </div>
+  <div class="teclado-grupo">
+    <span class="teclado-label">Agrupación</span>
+    <button type="button" class="tbtn" onclick="insertar('(')"> ( </button>
+    <button type="button" class="tbtn" onclick="insertar(')')"> ) </button>
+  </div>
+  <div class="teclado-grupo">
+    <span class="teclado-label">Funciones</span>
+    <button type="button" class="tbtn" onclick="insertar('sin(')">sin</button>
+    <button type="button" class="tbtn" onclick="insertar('cos(')">cos</button>
+    <button type="button" class="tbtn" onclick="insertar('tan(')">tan</button>
+    <button type="button" class="tbtn" onclick="insertar('log(')">log</button>
+    <button type="button" class="tbtn" onclick="insertar('ln(')">ln</button>
+    <button type="button" class="tbtn" onclick="insertar('exp(')">eˣ</button>
+    <button type="button" class="tbtn" onclick="insertar('abs(')">|x|</button>
+  </div>
+  <div class="teclado-grupo">
+    <span class="teclado-label">Constantes</span>
+    <button type="button" class="tbtn tbtn-dim" onclick="insertar('pi')">π</button>
+    <button type="button" class="tbtn tbtn-dim" onclick="insertar('e')">e</button>
+  </div>
+  <div class="teclado-grupo" style="margin-left:auto;">
+    <span class="teclado-label">Edición</span>
+    <button type="button" class="tbtn tbtn-del" onclick="borrarUltimo()">⌫</button>
+    <button type="button" class="tbtn tbtn-del" onclick="limpiar()">✕</button>
+  </div>
+</div>

@@ -1,0 +1,201 @@
+/* ═══════════════════════════════════════
+   PASO A PASO
+   ═══════════════════════════════════════ */
+
+/* ── Botón disparador ── */
+.btn-paso-a-paso {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: 1px solid rgba(0,153,255,0.35);
+  color: var(--accent2);
+  border-radius: 8px;
+  padding: 9px 18px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.18s;
+  margin-bottom: 24px;
+}
+.btn-paso-a-paso:hover {
+  background: rgba(0,153,255,0.08);
+  border-color: var(--accent2);
+  box-shadow: 0 4px 16px rgba(0,153,255,0.15);
+}
+
+/* ── Sección contenedora ── */
+#pap-seccion {
+  display: none;
+  margin-bottom: 24px;
+}
+
+/* ── Barra de controles ── */
+.pap-controles {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.pap-btn-nav {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 7px;
+  padding: 7px 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.pap-btn-nav:hover:not(:disabled) {
+  border-color: var(--accent2);
+  color: var(--accent2);
+}
+.pap-btn-nav:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+.pap-contador {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text2);
+  min-width: 60px;
+  text-align: center;
+}
+.pap-btn-todo {
+  margin-left: auto;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text3);
+  border-radius: 7px;
+  padding: 7px 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.pap-btn-todo:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ── Paso individual ── */
+.pap-paso {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 22px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  animation: pap-fade-in 0.22s ease;
+}
+.pap-paso-final {
+  border-color: rgba(0,229,160,0.25);
+  background: linear-gradient(135deg, rgba(0,229,160,0.04), var(--bg2));
+}
+
+@keyframes pap-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Header del paso ── */
+.pap-paso-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.pap-n {
+  font-size: 13px;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--accent2);
+  letter-spacing: 1px;
+}
+.pap-badge-ok {
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--accent);
+  background: rgba(0,229,160,0.1);
+  border: 1px solid rgba(0,229,160,0.25);
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+/* ── Líneas de ecuación ── */
+.pap-linea {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 12px;
+  align-items: start;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+}
+.pap-lbl {
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text3);
+  padding-top: 2px;
+}
+.pap-eq {
+  color: var(--text);
+  line-height: 1.9;
+}
+.pap-eq strong {
+  color: var(--text);
+}
+
+/* ── Línea de fórmula destacada ── */
+.pap-linea-formula {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent2);
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+.pap-resultado {
+  color: var(--accent2) !important;
+  font-size: 15px;
+}
+
+/* ── Línea de raíz ── */
+.pap-linea-raiz {
+  background: rgba(0,229,160,0.06);
+  border: 1px solid rgba(0,229,160,0.2);
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+.pap-raiz-val strong {
+  color: var(--accent) !important;
+  font-size: 15px;
+}
+
+/* ── Separador entre pasos (modo ver todo) ── */
+.pap-separador {
+  height: 1px;
+  background: var(--border);
+  margin: 16px 0;
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .pap-linea {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+  .pap-lbl {
+    font-size: 9px;
+  }
+  .pap-paso {
+    padding: 16px;
+  }
+  .pap-controles {
+    gap: 6px;
+  }
+}
